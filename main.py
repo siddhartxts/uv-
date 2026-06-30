@@ -1,6 +1,5 @@
 import os
 
-# Run "uv sync" to install the below packages
 import requests
 from dotenv import load_dotenv
 
@@ -41,11 +40,8 @@ def generate_x_post(topic: str) -> str:
 
 
 def main():
-    # user input => AI (LLM) to generate X post => output post
-
     usr_input = input("What should the post be about? ")
     x_post = generate_x_post(usr_input)
-    print("Generated X post")
     print(x_post)
 
 

@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -iE \"gitignore|github|readme|test|\\\\.git$\")",
+      "Bash(.venv/bin/python -c \"import sys; sys.path.insert\\(0,'src'\\); import main; print\\('app imports OK; routes:', sorted\\({r.path for r in main.app.routes if r.path.startswith\\(\\('/watchlist','/financenotes','/ingest','/health'\\)\\)}\\)\\)\")",
+      "Bash(.venv/bin/python -m pytest -q)",
+      "Bash(grep -n \"make dev\\\\|^pytest\\\\| pytest$\\\\|run on the host\\\\|host uvicorn\" README.md)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.py) \"$CLAUDE_PROJECT_DIR/.venv/bin/python\" -m black --quiet \"$f\" 2>/dev/null || true;; esac"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "ponytail@ponytail": true,
+    "github@claude-plugins-official": true
+  }
+}
