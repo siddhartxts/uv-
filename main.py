@@ -1,5 +1,7 @@
+import sys
+
 def main():
-    print("Hello from neway!")
+    print(sys.executable)
 
 
 if __name__ == "__main__":
