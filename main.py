@@ -1,48 +1,37 @@
 import os
 
-import requests
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+api_key = os.environ.get("DEEPSEEK_API_KEY")
+if not api_key:
+    raise SystemExit("Missing DEEPSEEK_API_KEY — add it to your .env file (see .env.example).")
+
+client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+
+SYSTEM_PROMPT = (
+    "You are an expert social media manager who writes viral, highly engaging "
+    "posts for X. Write a concise, impactful post tailored to the topic. "
+    "Avoid hashtags and limit emojis. Use line breaks and empty lines for readability."
+)
 
 
 def generate_x_post(topic: str) -> str:
-    prompt = f"""
-        You are an expert social media manager, and you excel at crafting viral and highly engaging posts for X (formerly Twitter).
-
-        Your task is to generate a post that is concise, impactful, and tailored to the topic provided by the user.
-        Avoid using hashtags and lots of emojis (a few emojis are okay, but not too many).
-
-        Keep the post short and focused, structure it in a clean, readable way, using line breaks and empty lines to enhance readability.
-
-        Here's the topic provided by the user for which you need to generate a post:
-        <topic>
-        {topic}
-        </topic>
-"""
-    payload = {"model": "gpt-4o", "input": prompt}
-    response = requests.post(
-        "https://api.openai.com/v1/responses",
-        json=payload,
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-        },
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": topic},
+        ],
     )
-
-    response_text = (
-        response.json().get("output", [{}])[0].get("content", [{}])[0].get("text", "")
-    )
-
-    return response_text
+    return response.choices[0].message.content
 
 
 def main():
-    usr_input = input("What should the post be about? ")
-    x_post = generate_x_post(usr_input)
-    print(x_post)
+    topic = input("What should the post be about? ")
+    print(generate_x_post(topic))
 
 
 if __name__ == "__main__":

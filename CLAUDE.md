@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**neway** is a Python 3.12 web service project using FastAPI and Flask. The project is in early stages with minimal implementation.
+**neway** is a Python 3.12 command-line script that generates X (Twitter) posts from a topic using the DeepSeek API (via the OpenAI-compatible SDK). It's a learning project for building AI workflows.
 
 ## Development Setup
 
@@ -25,12 +25,9 @@ source .venv/bin/activate
 ## Running the Project
 
 ```bash
-# Run the main script
-python main.py
-
-# If running a web service (FastAPI/Flask server):
-# uvicorn main:app --reload  # For FastAPI
-# python -m flask run        # For Flask (if configured)
+# Requires a DeepSeek API key in .env (see https://platform.deepseek.com):
+#   DEEPSEEK_API_KEY=sk-...
+python main.py   # prompts for a topic, prints a generated post
 ```
 
 ## Common Commands
@@ -61,8 +58,5 @@ python -m mypy .           # Type checking (if mypy is added)
 
 - The project uses **uv** for dependency management, which is significantly faster than traditional pip. Always use `uv` commands for package operations.
 - Dependencies are defined in `pyproject.toml`; the lock file (`uv.lock`) should be committed to version control.
-- As the project develops with FastAPI and/or Flask, ensure:
-  - Routes are well-structured and documented
-  - Environment variables are managed appropriately (use `.env` files with python-dotenv if needed)
-  - Database models and migrations are set up (if applicable)
-  - Error handling and validation are implemented at API boundaries
+- The DeepSeek API is OpenAI-compatible: the `openai` SDK is pointed at `base_url="https://api.deepseek.com"`. Use the Chat Completions API (`client.chat.completions.create`), not the Responses API.
+- The API key is loaded from `.env` via `python-dotenv`; `.env` is gitignored and must not be committed.
